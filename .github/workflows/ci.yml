@@ -1,0 +1,55 @@
+name: CI - Continuous Integration
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+
+jobs:
+  test:
+    name: Run Tests
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ['3.8', '3.9', '3.10', '3.11', '3.12']
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v5
+      with:
+        python-version: ${{ matrix.python-version }}
+        cache: 'pip'
+    
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+    
+    - name: Run main system
+      run: |
+        python main.py
+      continue-on-error: false
+    
+    - name: Verify Phase 0 output
+      run: |
+        python -c "import sys; sys.path.insert(0, 'src'); from phase0.phase0 import phase0; print('Phase 0 import successful')"
+    
+    - name: Verify Phase 1 output
+      run: |
+        python -c "import sys; sys.path.insert(0, 'src'); from phase1.phase1 import phase1; print('Phase 1 import successful')"
+    
+    - name: Verify Phase 2 output
+      run: |
+        python -c "import sys; sys.path.insert(0, 'src'); from phase2.phase2 import phase2_multi_run; print('Phase 2 import successful')"
+    
+    - name: Verify Phase 3 output
+      run: |
+        python -c "import sys; sys.path.insert(0, 'src'); from phase3.phase3 import phase3_multi_run; print('Phase 3 import successful')"
+    
+    - name: Verify Phase 4 output
+      run: |
+        python -c "import sys; sys.path.insert(0, 'src'); from phase4.phase4 import phase4; print('Phase 4 import successful')"

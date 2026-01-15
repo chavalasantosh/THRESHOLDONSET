@@ -1,0 +1,110 @@
+"""
+THRESHOLD_ONSET — Phase 0 Graphics Visualization
+
+Shows residues appearing in real-time.
+No axes, no labels, no interpretation.
+Just visual accumulation of action residues.
+"""
+
+import turtle
+
+
+class ResidueVisualizer:
+    """
+    Visualizes residues appearing one by one.
+    Phase 0 compliant: no axes, no labels, no interpretation.
+    """
+
+    def __init__(self, width=800, height=600):
+        """Initialize visualization window."""
+        self.screen = turtle.Screen()
+        self.screen.setup(width=width, height=height)
+        self.screen.bgcolor("black")
+        self.screen.title("THRESHOLD_ONSET — Phase 0: Residue Accumulation")
+        self.screen.tracer(0)  # Turn off automatic updates for faster drawing
+        
+        # Hide default turtle
+        self.turtle = turtle.Turtle()
+        self.turtle.hideturtle()
+        self.turtle.speed(0)  # Fastest
+        
+        # Screen dimensions for mapping
+        self.width = width
+        self.height = height
+        self.margin = 50
+        
+        # Drawing area
+        self.draw_width = width - 2 * self.margin
+        self.draw_height = height - 2 * self.margin
+        
+        # Count of residues drawn
+        self.count = 0
+        
+        # Track positions for better visualization
+        self.positions = []
+
+    def draw_residue(self, residue_value):
+        """
+        Draw a single residue as a mark.
+        
+        residue_value: float between 0.0 and 1.0
+        Position mapped directly from value (no interpretation).
+        """
+        # Map residue value to screen position
+        # X: residue value maps to horizontal position (left to right)
+        x_pos = -self.draw_width / 2 + (residue_value * self.draw_width)
+        
+        # Y position: distribute vertically based on count
+        # Creates a waterfall/stream effect as residues accumulate
+        rows = max(1, (self.count // 40) + 1)  # New row every 40 residues
+        row_height = self.draw_height / rows
+        y_offset = (self.count % 40) * (row_height / 40)
+        y_pos = -self.draw_height / 2 + y_offset + (self.count // 40) * row_height
+        
+        # Store position for reference
+        self.positions.append((x_pos, y_pos, residue_value))
+        
+        # Draw residue as a small dot with color
+        self.turtle.penup()
+        self.turtle.goto(x_pos, y_pos)
+        self.turtle.pendown()
+        
+        # Color based on residue value (visual distinction, not interpretation)
+        # Map 0.0-1.0 to color spectrum (blue to red)
+        color_value = residue_value
+        if color_value < 0.33:
+            # Blue to cyan
+            r = 0
+            g = int(color_value * 3 * 255)
+            b = 255
+        elif color_value < 0.67:
+            # Cyan to yellow
+            r = int((color_value - 0.33) * 3 * 255)
+            g = 255
+            b = int((1 - (color_value - 0.33) * 3) * 255)
+        else:
+            # Yellow to red
+            r = 255
+            g = int((1 - (color_value - 0.67) * 3) * 255)
+            b = 0
+        
+        # Normalize to 0-1 for turtle
+        r_norm = min(255, max(0, r)) / 255.0
+        g_norm = min(255, max(0, g)) / 255.0
+        b_norm = min(255, max(0, b)) / 255.0
+        
+        self.turtle.color(r_norm, g_norm, b_norm)
+        self.turtle.dot(6)  # Slightly larger dot for visibility
+        
+        self.count += 1
+        
+        # Update screen (manual update since tracer is off)
+        self.screen.update()
+
+    def close(self):
+        """Close visualization window."""
+        self.screen.bye()
+
+    def keep_open(self):
+        """Keep window open until user closes it."""
+        self.screen.exitonclick()

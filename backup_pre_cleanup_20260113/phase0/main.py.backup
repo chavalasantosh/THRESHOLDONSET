@@ -1,0 +1,295 @@
+#!/usr/bin/env python3
+"""
+THRESHOLD_ONSET — Main Entry Point
+
+Phase 0: Action before Knowledge
+कार्य (kārya) happens before ज्ञान (jñāna)
+"""
+
+import sys
+import time
+import random
+from pathlib import Path
+from datetime import datetime
+
+# Add src directory to path for proper imports
+project_root = Path(__file__).parent
+src_dir = project_root / "src"
+if str(src_dir) not in sys.path:
+    sys.path.insert(0, str(src_dir))
+
+
+def visualize_trace(trace, count, step, total_steps, action_count, show_trace=True):  # pylint: disable=unused-argument
+    """Visualize a single trace being collected."""
+    # Simple visual representation - no plots, no coordinates
+    # Just showing the process of accumulation
+
+    # Calculate progress
+    progress = (step / total_steps) * 100
+
+    # Visual indicator (progress bar)
+    bar_length = 50
+    filled = int(bar_length * step / total_steps)
+    progress_bar = "█" * filled + "░" * (bar_length - filled)
+
+    # Show trace accumulation with animation
+    trace_char = "●" if count % 2 == 0 else "○"
+
+    if show_trace:
+        # Show actual trace value being processed
+        output = (f"\r[{progress_bar}] {trace_char} "
+                  f"Step {step:3d}/{total_steps} | "
+                  f"Residues: {count:3d} | "
+                  f"Current: {trace:.6f} | "
+                  f"{progress:5.1f}%")
+    else:
+        output = (f"\r[{progress_bar}] {trace_char} "
+                  f"Step {step:3d}/{total_steps} | "
+                  f"Residues: {count:3d} | "
+                  f"{progress:5.1f}%")
+    sys.stdout.write(output)
+    sys.stdout.flush()
+
+
+def run_phase0():
+    """Run Phase 0 pipeline with visualization."""
+    # Import here after path setup (intentional)
+    from phase0.phase0 import phase0  # pylint: disable=import-outside-toplevel,import-error
+
+    # Raw actions - structureless residues only
+    # No strings, no labels, no meaning
+    # Just raw action residues
+    # Using lambda to create callables (required for actions)
+    actions = [
+        lambda: random.random(),  # pylint: disable=unnecessary-lambda
+        lambda: random.random(),  # pylint: disable=unnecessary-lambda
+    ]
+
+    steps = 10
+    total_actions = len(actions) * steps
+
+    print("=" * 70)
+    print("THRESHOLD_ONSET — Phase 0")
+    print("=" * 70)
+    print()
+    print("Configuration:")
+    print(f"  Actions: {len(actions)}")
+    print(f"  Steps: {steps}")
+    print(f"  Total iterations: {total_actions}")
+    print(f"  Started: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
+    print()
+    print("What Is Being Processed:")
+    print("-" * 70)
+    print("  Type: Float (decimal number)")
+    print("  Range: 0.0 to 1.0 (exclusive)")
+    print("  Source: random.random() - structureless residue")
+    print("  Example: 0.642099, 0.836444, 0.776066")
+    print("  Format: Raw numeric value, no meaning, no interpretation")
+    print()
+    print("What The Decimal Number Represents:")
+    print("-" * 70)
+    print("  The decimal number is a RESIDUE — a leftover trace from an action.")
+    print("  It is NOT doing anything functional.")
+    print("  It is NOT representing anything meaningful.")
+    print("  It is just PROOF that an action happened.")
+    print()
+    print("  Think of it like:")
+    print("    - A footprint in sand (the footprint exists, but has no meaning)")
+    print("    - A scratch on a surface (evidence of contact, nothing more)")
+    print("    - A random mark (structureless, opaque, uninterpretable)")
+    print()
+    print("  In Phase 0, the decimal number is the MINIMAL possible evidence")
+    print("  that 'something happened' — without any structure or meaning.")
+    print()
+    print("What Exactly Is Happening (Step-by-Step):")
+    print("-" * 70)
+    print("  1. There are 2 actions (callable functions)")
+    print("  2. Each action, when called, generates a random decimal (0.0 to 1.0)")
+    print("  3. This decimal is the 'residue' — proof the action occurred")
+    print("  4. The process repeats:")
+    print("     - Step 1: Run Action[0] → Get residue (e.g., 0.642099)")
+    print("     - Step 2: Run Action[1] → Get residue (e.g., 0.836444)")
+    print("     - Step 3: Run Action[0] → Get residue (e.g., 0.776066)")
+    print("     - Step 4: Run Action[1] → Get residue (e.g., 0.627130)")
+    print("     - ... (repeats 10 times total)")
+    print("  5. Each residue is collected in a list (no interpretation)")
+    print("  6. After collection, statistics are calculated:")
+    print("     - How many residues? (count)")
+    print("     - How many unique? (collision detection)")
+    print("     - What's the range? (min/max)")
+    print("     - How are they distributed? (bins)")
+    print()
+    print("  Total Process:")
+    print(f"    - {len(actions)} actions × {steps} steps = {total_actions} residues")
+    print("    - Each residue is just a number (no meaning, no structure)")
+    print("    - The system proves: 'Action happened → Residue exists'")
+    print("    - That's it. Nothing more. Phase 0 constraint.")
+    print()
+    print("=" * 70)
+    print("Execution: Action → Residue → Repeat")
+    print("=" * 70)
+    print()
+
+    traces = []
+    processing_log = []  # Store processing steps for later display
+    start_time = time.time()
+
+    # Initialize graphics visualization
+    try:
+        from phase0.visualize import ResidueVisualizer  # pylint: disable=import-outside-toplevel,import-error
+        visualizer = ResidueVisualizer(width=900, height=700)
+        print("Graphics visualization: Window opened. Watch residues appear...")
+        print()
+    except Exception as e:  # pylint: disable=broad-except
+        print(f"Graphics visualization unavailable: {e}")
+        print("Continuing with text-only output...")
+        print()
+        visualizer = None
+
+    # Animated collection with real-time trace display
+    for trace, count, step in phase0(actions, steps=steps):
+        traces.append(trace)
+
+        # Determine which action generated this trace
+        action_index = (step - 1) % len(actions)
+
+        # Store processing step for later display
+        processing_log.append((step, action_index, trace, count))
+
+        # Show in progress bar with current trace value
+        visualize_trace(trace, count, step, total_actions, len(actions), show_trace=True)
+
+        # Draw residue in graphics window
+        if visualizer:
+            visualizer.draw_residue(trace)
+
+        time.sleep(0.05)  # Animation delay (shorter for graphics mode)
+
+    end_time = time.time()
+    execution_time = end_time - start_time
+
+    print()  # New line after progress bar
+    print()
+    print("=" * 70)
+    print("Results")
+    print("=" * 70)
+    print()
+
+    # Show only structureless statistics - no trace values
+    # No labels, no interpretation, just raw counts
+    unique_count = len(set(traces))
+    collision_rate = 1.0 - (unique_count / len(traces)) if traces else 0.0
+    collection_rate = len(traces) / execution_time if execution_time > 0 else 0
+
+    # Value range (raw numbers, not interpretation)
+    min_value = min(traces) if traces else 0
+    max_value = max(traces) if traces else 0
+    value_range = max_value - min_value
+
+    print("Execution Summary:")
+    print("-" * 70)
+    print(f"  Started:        {datetime.fromtimestamp(start_time).strftime('%H:%M:%S')}")
+    print(f"  Completed:      {datetime.fromtimestamp(end_time).strftime('%H:%M:%S')}")
+    print(f"  Duration:       {execution_time:.3f} seconds")
+    print(f"  Collection rate: {collection_rate:.2f} residues/second")
+    print()
+
+    print("Residue Statistics (Opaque, Un-nameable):")
+    print("-" * 70)
+    print(f"  Total residues collected: {len(traces)}")
+    print(f"  Unique residues:          {unique_count}")
+    print(f"  Collision rate:           {collision_rate:.4f}")
+    print()
+
+    print("Value Range (Raw Numbers Only):")
+    print("-" * 70)
+    print(f"  Minimum value:  {min_value:.6f}")
+    print(f"  Maximum value:  {max_value:.6f}")
+    print(f"  Range:          {value_range:.6f}")
+    print()
+
+    # Simple text-based distribution (no plots, just visual)
+    print("Value Distribution (Text Visualization):")
+    print("-" * 70)
+    if traces:
+        # Create 20 bins for simple visualization
+        bins = 20
+        bin_counts = [0] * bins
+        for trace in traces:
+            if value_range > 0:
+                bin_idx = min(int((trace - min_value) / value_range * bins), bins - 1)
+            else:
+                bin_idx = 0
+            bin_counts[bin_idx] += 1
+
+        max_bin_count = max(bin_counts) if bin_counts else 1
+        bar_length = 40
+
+        for i, count in enumerate(bin_counts):
+            bar_fill = int((count / max_bin_count) * bar_length)
+            bar_visual = "█" * bar_fill + "░" * (bar_length - bar_fill)
+            bin_start = min_value + (i / bins) * value_range
+            bin_end = min_value + ((i + 1) / bins) * value_range
+            print(f"  [{bin_start:.3f}-{bin_end:.3f}] {bar_visual} {count:3d}")
+    print()
+
+    print("Real-time Processing (What Actually Happened):")
+    print("-" * 70)
+    print("  Format: Step | Action[Index] → Residue (Type: float) | Total Collected")
+    print()
+    for step, action_idx, trace_val, total_count in processing_log[:20]:
+        residue_type = type(trace_val).__name__
+        print(f"  Step {step:3d} | Action[{action_idx}] → {trace_val:.6f} "
+              f"({residue_type}) | Total: {total_count:3d}")
+    if len(processing_log) > 20:
+        print(f"  ... ({len(processing_log) - 20} more processing steps)")
+    print()
+
+    print("Residue Data Type Analysis:")
+    print("-" * 70)
+    if traces:
+        sample = traces[0]
+        print(f"  Type: {type(sample).__name__}")
+        print(f"  Size: {sample.__sizeof__()} bytes (per residue)")
+        print("  Precision: ~15-17 decimal digits")
+        print("  Range: 0.0 < value < 1.0")
+        print("  Nature: Opaque numeric residue, no structure, no meaning")
+    print()
+
+    print("Residue Values (Raw, Structureless):")
+    print("-" * 70)
+    # Display residues in pairs for clean formatting
+    for i in range(0, min(len(traces), 20), 2):
+        if i + 1 < len(traces):
+            print(f"  [{i:2d}] {traces[i]:.6f} | [{i+1:2d}] {traces[i+1]:.6f}")
+        else:
+            print(f"  [{i:2d}] {traces[i]:.6f}")
+    if len(traces) > 20:
+        print(f"  ... ({len(traces) - 20} more residues)")
+    print()
+
+
+    print("Phase 0 Constraints:")
+    print("-" * 70)
+    print("  ✓ Residues are structureless (random.random())")
+    print("  ✓ Residues shown as raw values (no interpretation)")
+    print("  ✓ No labels, no names, no classification")
+    print("  ✓ Values displayed for transparency/analysis only")
+    print()
+
+    print("=" * 70)
+    print("Phase 0 Complete")
+    print("=" * 70)
+    print()
+
+    # Keep graphics window open for viewing
+    if visualizer:
+        print("Graphics visualization: Click on the window to close it.")
+        print()
+        visualizer.keep_open()
+
+    return traces
+
+
+if __name__ == "__main__":
+    run_phase0()
